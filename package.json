@@ -1,13 +1,13 @@
 {
-    "name"         : "node-red-nr-injector",
+    "name"         : "node-red-contrib-nr-injector",
     "version"      : "0.0.1",
     "description"  : "An injector node for mobile devices",
     "dependencies": {
     },
-    "keywords": [ "node-red" ],
+    "keywords": [ "node-red", "nr-injector", "NR Injector" ],
     "node-red"     : {
         "nodes": {
-            "sample": "nr-injector/nr-injector.js"
+            "nr-injector": "nr-injector/nr-injector.js"
         }
     }
 }
