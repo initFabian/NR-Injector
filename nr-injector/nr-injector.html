@@ -1,0 +1,127 @@
+
+
+<script type="text/x-red" data-template-name="NR Injector in">
+    <div class="form-row node-input-payload">
+        <label for="node-input-payloadType"><i class="fa fa-envelope"></i> Payload</label>
+        <select id="node-input-payloadType" style="width:125px !important">
+          <option value="date">timestamp</option>
+          <option value="none">blank</option>
+          <option value="string">string</option>
+      </select>
+  </div>
+  <div class="form-row" id="node-input-row-payload">
+    <label for="node-input-payload"></label>
+    <input type="text" id="node-input-payload" placeholder="payload">
+</div>
+<div class="form-row">
+    <label for="node-input-manager">Injector Manager:</label>
+    <input type="text" id="node-input-manager">
+</div>
+<div class="form-row">
+    <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+    <input type="text" id="node-input-name" placeholder="Name">
+</div>
+</script>
+
+<script type="text/x-red" data-help-name="NR Injector in">
+    <p>Provides an input node for iOS and Android devices, allowing simple integration with mobile devices. Simply enter a password that you will remember because it will be needed on the device.</p>
+    <p>NR Inject on the <a href="https://itunes.apple.com/us/app/nr-inject/id960596793?ls=1&mt=8">Apple App Store</a></p>
+    <p>NR Inject on the <a href="https://play.google.com/store/apps/details?id=com.mioty.fabianbuentello.nrinject">Google Play Store</a></p>
+</script>
+
+<script type="text/javascript">
+    RED.nodes.registerType('NR Injector in',{
+        category: 'input',
+        defaults: {
+            name: {value:"NR Injector"},
+            payload: {value:""},
+            payloadType: {value:"date"},
+            manager: {type:"injector-manager"}
+        },
+        color:"rgb(215, 215, 160)",
+        inputs:0,
+        outputs:1,
+        icon: "white-globe.png",
+        label: function() {
+            return this.name||"NR Injector";
+        },
+        labelStyle: function() {
+            if (this.payloadType === "string") {
+                return this.name||this.topic||this.payload||"inject";
+            }
+            return this.name?"node_label_italic":"";
+        },
+        oneditprepare: function() {
+            var managerSet = false;
+
+            RED.nodes.eachConfig(function(data) {
+                if (data && data.type === 'injector-manager') {
+                    this.manager = data.id
+                    $('#node-input-manager').attr('disabled', 'disabled');
+                } else {
+                    $('#node-input-manager').removeAttr('disabled');
+                }
+            })
+
+            if (this.payloadType == null) {
+                if (this.payload == "") {
+                    this.payloadType = "date";
+                } else {
+                    this.payloadType = "string";
+                }
+            }
+
+            $("#node-input-payloadType").change(function() {
+                var id = $("#node-input-payloadType option:selected").val();
+                if (id == "string") {
+                    $("#node-input-row-payload").show();
+                } else {
+                    $("#node-input-row-payload").hide();
+                }
+            });
+            $("#node-input-payloadType").val(this.payloadType);
+            $("#node-input-payloadType").change();
+            $("#inject-time-type-select").change();
+        }
+    });
+</script>
+
+<!-- Config Node -->
+<script type="text/x-red" data-template-name="injector-manager">
+    <div class="form-row">
+        <label for="node-config-input-ip">IP address:</label>
+        <input type="text" id="node-config-input-ip" value="" disabled>
+    </div>
+    <div class="form-row">
+        <label for="node-config-input-password">Password:</label>
+        <input type="text" id="node-config-input-password" value="">
+    </div>
+    <div class="form-tips">
+     This node utilizes '/injector' path. As such there may only be one of these.
+ </div>
+</script>
+
+<script type="text/x-red" data-help-name="injector-manager">
+   HELP
+</script>
+
+<script type="text/javascript">
+    RED.nodes.registerType('injector-manager',{
+        category: 'config',
+        defaults: {
+            ip: {value:"",required:true},
+            password: {value:"", required:true}
+        },
+        inputs:0,
+        outputs:0,
+        label: function() {
+            return 'NR Injector Config';
+        },
+        oneditprepare: function() {
+            $.get( "/injector/ip", function( data ) {
+                $('#node-config-input-ip').val(data);
+            });
+        }
+
+    });
+</script>
